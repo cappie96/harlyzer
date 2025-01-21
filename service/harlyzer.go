@@ -271,6 +271,7 @@ func (t *Terminal) CreateInputField(har *harlyzer.HAR) {
 }
 
 func (t *Terminal) Layout() {
+	primitives := []tview.Primitive{t.table, t.dropdown, t.input}
 	form := tview.NewForm().AddFormItem(t.dropdown).AddFormItem(t.input)
 	form.AddButton("Quit", func() {
 		t.app.Stop()
@@ -279,6 +280,23 @@ func (t *Terminal) Layout() {
 	t.main = tview.NewFlex().SetDirection(tview.FlexColumn).
 		AddItem(form, 60, 1, false).
 		AddItem(t.table, 0, 1, true)
+
+	t.main.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyTab {
+			for i, primitive := range primitives {
+				if primitive == t.app.GetFocus() {
+					t.app.SetFocus(primitives[(i+1)%len(primitives)])
+					return nil
+				}
+			}
+		}
+		if event.Key() == tcell.KeyEsc {
+			t.app.Stop()
+			return nil
+		}
+		return event
+	})
+
 	t.app.SetRoot(t.main, true).EnableMouse(true)
 }
 
