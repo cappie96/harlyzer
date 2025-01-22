@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/cap79/harlyzer/harlyzer"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"harlyzer/harlyzer"
 )
 
 type Terminal struct {

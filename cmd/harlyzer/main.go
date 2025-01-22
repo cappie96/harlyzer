@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"harlyzer/harlyzer"
-	"harlyzer/service"
+	"github.com/cap79/harlyzer/harlyzer"
+	"github.com/cap79/harlyzer/service"
 )
 
 func main() {

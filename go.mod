@@ -1,4 +1,4 @@
-module harlyzer
+module github.com/cap79/harlyzer
 
 go 1.23
 
