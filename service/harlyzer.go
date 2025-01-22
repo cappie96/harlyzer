@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"reflect"
 	"sort"
 
 	"github.com/cap79/harlyzer/harlyzer"
@@ -126,7 +127,8 @@ func (t *Terminal) ShowResponseDetails(entry harlyzer.Entry) {
 
 func (t *Terminal) showTimingDetails(entry harlyzer.Entry) {
 	timingsView := tview.NewTextView().
-		SetDynamicColors(true).SetText(fmt.Sprintf("[yellow]Timings:[white]\n%d", entry.Timings)).
+		SetDynamicColors(true).
+		SetText(fmt.Sprintf("[yellow]Timings:[white]\n%s", formatTimings(entry.Timings))).
 		SetScrollable(true).
 		SetWrap(true)
 	timingsView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -136,6 +138,18 @@ func (t *Terminal) showTimingDetails(entry harlyzer.Entry) {
 		return event
 	})
 	t.app.SetRoot(timingsView, true).EnableMouse(true)
+}
+
+func formatTimings(s interface{}) string {
+	v := reflect.ValueOf(s)
+	t := reflect.TypeOf(s)
+	var formattedTimings string
+	for i := 0; i < v.NumField(); i++ {
+		fieldName := t.Field(i).Name
+		fieldValue := v.Field(i).Int()
+		formattedTimings += fmt.Sprintf("%s: %dms\n", fieldName, fieldValue)
+	}
+	return formattedTimings
 }
 
 func (t *Terminal) showContentDetails(entry harlyzer.Entry) {
