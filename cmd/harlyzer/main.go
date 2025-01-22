@@ -9,19 +9,16 @@ import (
 )
 
 func main() {
-	harFilePath := "/home/cap52/Development/harlyzer/www.wireshark.org.har"
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: harlyzer <har-file>")
+		return
+	}
+	harFilePath := os.Args[1]
 
 	har, err := harlyzer.ParseHarFile(harFilePath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error parsing HAR file: %v\n", err)
 	}
-
-	//fmt.Println("HAR file Parsed Successfully")
-	//fmt.Printf("Log Creator: %s v%s\n", har.Log.Creator.Name, har.Log.Creator.Version)
-	//for _, entry := range har.Log.Entries {
-	//	fmt.Printf("Request URL: %s, Method: %s, Status: %d\n", entry.Request.URL,
-	//		entry.Request.Method, entry.Response.Status)
-	//}
 
 	emulator := os.Getenv("TERM")
 	if emulator == "" {
