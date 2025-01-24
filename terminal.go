@@ -3,6 +3,7 @@ package harlyzer
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -57,7 +58,7 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 		t.table.Clear()
 		t.SetTableHeader(headers)
 		for _, entry := range har.Log.Entries {
-			if entry.Request.URL == url && entry.Response.Status >= minCode && entry.Response.Status <= maxCode {
+			if strings.Contains(entry.Request.URL, url) && entry.Response.Status >= minCode && entry.Response.Status <= maxCode {
 				t.populateRow(rowIndex, entry)
 				rowIndex++
 			}
@@ -253,9 +254,9 @@ func (t *Terminal) CreateInputField(har *HAR) {
 		url := t.input.GetText()
 		if url != "" {
 			for _, entry := range har.Log.Entries {
-				if entry.Request.URL == url {
+				if strings.Contains(entry.Request.URL, url) {
 					t.CreateTable(har, "", url)
-					break
+					return
 				}
 			}
 		} else {
