@@ -21,6 +21,8 @@ type Entry struct {
 	Request         Request  `json:"request"`
 	Response        Response `json:"response"`
 	Timings         Timings  `json:"timings"`
+	ServerIP        string   `json:"serverIPAddress"`
+	Connection      string   `json:"connection"`
 }
 
 type Request struct {

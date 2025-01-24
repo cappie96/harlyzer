@@ -38,7 +38,7 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 	t.table.SetBorder(true).SetTitle("HAR Log")
 
 	// Headers
-	headers := []string{"#", "Method", "Status", "URL", "Time (ms)"}
+	headers := []string{"#", "Method", "Status", "Domain", "Server IP", "Connection", "Time (ms)"}
 	t.SetTableHeader(headers)
 	// Parse code filter
 	minCode, maxCode := parseCodeFilter(code)
@@ -189,7 +189,9 @@ func (t *Terminal) populateRow(rowIndex int, entry Entry) {
 	t.setTableCell(rowIndex, 1, entry.Request.Method, tview.AlignLeft, true)
 	t.setTableCell(rowIndex, 2, fmt.Sprintf("%d", entry.Response.Status), tview.AlignCenter, true)
 	t.setTableCell(rowIndex, 3, formatUrl(entry.Request.URL), tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 4, fmt.Sprintf("%.2f", entry.Time*1000), tview.AlignRight, true)
+	t.setTableCell(rowIndex, 4, entry.ServerIP, tview.AlignCenter, true)
+	t.setTableCell(rowIndex, 5, entry.Connection, tview.AlignCenter, true)
+	t.setTableCell(rowIndex, 6, fmt.Sprintf("%.2f", entry.Time*1000), tview.AlignRight, true)
 }
 
 // Helper function to set table cells
