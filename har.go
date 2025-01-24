@@ -58,11 +58,11 @@ type Content struct {
 }
 
 type Timings struct {
-	Blocked int `json:"blocked"`
-	DNS     int `json:"dns"`
-	Connect int `json:"connect"`
-	SSL     int `json:"ssl"`
-	Send    int `json:"send"`
-	Wait    int `json:"wait"`
-	Receive int `json:"receive"`
+	Blocked float64 `json:"blocked"`
+	DNS     float64 `json:"dns"`
+	Connect float64 `json:"connect"`
+	SSL     float64 `json:"ssl"`
+	Send    float64 `json:"send"`
+	Wait    float64 `json:"wait"`
+	Receive float64 `json:"receive"`
 }

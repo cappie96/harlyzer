@@ -3,7 +3,12 @@ package harlyzer
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
+
+func formatUrl(url string) string {
+	return strings.Split(url, "/")[2]
+}
 
 func formatTimings(s interface{}) string {
 	v := reflect.ValueOf(s)
@@ -13,8 +18,9 @@ func formatTimings(s interface{}) string {
 	formattedTimings += "------------------------\n"
 	for i := 0; i < v.NumField(); i++ {
 		fieldName := t.Field(i).Name
-		fieldValue := v.Field(i).Int()
-		formattedTimings += fmt.Sprintf("%-10s | %dms\n", fieldName, fieldValue)
+		fieldValue := v.Field(i).Float()
+		formattedTimings += fmt.Sprintf("%-10s | %.3f"+
+			"ms\n", fieldName, fieldValue)
 	}
 	return formattedTimings
 }
