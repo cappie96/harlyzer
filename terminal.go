@@ -46,6 +46,7 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 	rowIndex := 1 // Start populating from the second row
 	if url == "" {
 		t.table.Clear()
+		t.SetTableHeader(headers)
 		for _, entry := range har.Log.Entries {
 			if entry.Request.URL != url && entry.Response.Status >= minCode && entry.Response.Status <= maxCode {
 				t.populateRow(rowIndex, entry)
