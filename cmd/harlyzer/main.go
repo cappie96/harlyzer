@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cap79/harlyzer/harlyzer"
-	"github.com/cap79/harlyzer/service"
+	"github.com/cap79/harlyzer"
 )
 
 func main() {
@@ -30,7 +29,7 @@ func main() {
 		}
 	}
 
-	term := service.NewTerminal()
+	term := harlyzer.NewTerminal()
 	term.Init()
 	if err := term.Run(har); err != nil {
 		fmt.Fprintf(os.Stderr, "application error: %v\n", err)

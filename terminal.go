@@ -1,11 +1,9 @@
-package service
+package harlyzer
 
 import (
 	"fmt"
-	"reflect"
 	"sort"
 
-	"github.com/cap79/harlyzer/harlyzer"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -30,7 +28,7 @@ func (t *Terminal) Init() {
 	t.input = tview.NewInputField()
 }
 
-func (t *Terminal) CreateTable(har *harlyzer.HAR, code string, url string) {
+func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 	if har == nil || har.Log.Entries == nil {
 		fmt.Println("Invalid HAR data")
 		return
@@ -73,7 +71,7 @@ func (t *Terminal) CreateTable(har *harlyzer.HAR, code string, url string) {
 		})
 }
 
-func (t *Terminal) showURLOptions(entry harlyzer.Entry) {
+func (t *Terminal) showURLOptions(entry Entry) {
 	t.modal = tview.NewModal().SetText("Select an option").
 		AddButtons([]string{"Request Headers", "Response Headers", "Content", "Timings", "Cancel"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
@@ -93,7 +91,7 @@ func (t *Terminal) showURLOptions(entry harlyzer.Entry) {
 	t.app.SetRoot(t.modal, true).EnableMouse(true)
 }
 
-func (t *Terminal) showRequestDetails(entry harlyzer.Entry) {
+func (t *Terminal) showRequestDetails(entry Entry) {
 	requestView := tview.NewTextView().
 		SetDynamicColors(true).
 		SetText(fmt.Sprintf("[yellow]Request Headers:[white]\n%s", formatHeaders(entry.Request.Headers))).
@@ -109,7 +107,7 @@ func (t *Terminal) showRequestDetails(entry harlyzer.Entry) {
 	t.app.SetRoot(requestView, true).EnableMouse(true)
 }
 
-func (t *Terminal) ShowResponseDetails(entry harlyzer.Entry) {
+func (t *Terminal) ShowResponseDetails(entry Entry) {
 	responseView := tview.NewTextView().
 		SetDynamicColors(true).
 		SetText(fmt.Sprintf("[yellow]Response Headers:[white]\n%s", formatHeaders(entry.Response.Headers))).
@@ -125,7 +123,7 @@ func (t *Terminal) ShowResponseDetails(entry harlyzer.Entry) {
 	t.app.SetRoot(responseView, true).EnableMouse(true)
 }
 
-func (t *Terminal) showTimingDetails(entry harlyzer.Entry) {
+func (t *Terminal) showTimingDetails(entry Entry) {
 	timingsView := tview.NewTextView().
 		SetDynamicColors(true).
 		SetText(fmt.Sprintf("[yellow]Timings:[white]\n%s", formatTimings(entry.Timings))).
@@ -140,21 +138,7 @@ func (t *Terminal) showTimingDetails(entry harlyzer.Entry) {
 	t.app.SetRoot(timingsView, true).EnableMouse(true)
 }
 
-func formatTimings(s interface{}) string {
-	v := reflect.ValueOf(s)
-	t := reflect.TypeOf(s)
-	var formattedTimings string
-	formattedTimings += fmt.Sprintf("%-10s | %s\n", "Phase", "Time (ms)")
-	formattedTimings += "------------------------\n"
-	for i := 0; i < v.NumField(); i++ {
-		fieldName := t.Field(i).Name
-		fieldValue := v.Field(i).Int()
-		formattedTimings += fmt.Sprintf("%-10s | %dms\n", fieldName, fieldValue)
-	}
-	return formattedTimings
-}
-
-func (t *Terminal) showContentDetails(entry harlyzer.Entry) {
+func (t *Terminal) showContentDetails(entry Entry) {
 	contentView := tview.NewTextView().
 		SetDynamicColors(true).
 		SetText(fmt.Sprintf("[yellow]Content:[white]\n%s", entry.Response.Content.Text)).
@@ -167,14 +151,6 @@ func (t *Terminal) showContentDetails(entry harlyzer.Entry) {
 		return event
 	})
 	t.app.SetRoot(contentView, true).EnableMouse(true)
-}
-
-func formatHeaders(headers []harlyzer.Header) string {
-	var formattedHeaders string
-	for _, header := range headers {
-		formattedHeaders += fmt.Sprintf("%s: %s\n", header.Name, header.Value)
-	}
-	return formattedHeaders
 }
 
 func (t *Terminal) SetTableHeader(headers []string) {
@@ -205,7 +181,7 @@ func parseCodeFilter(code string) (int, int) {
 	}
 }
 
-func (t *Terminal) populateRow(rowIndex int, entry harlyzer.Entry) {
+func (t *Terminal) populateRow(rowIndex int, entry Entry) {
 	t.setTableCell(rowIndex, 0, fmt.Sprintf("%d", rowIndex), tview.AlignCenter, true)
 	t.setTableCell(rowIndex, 1, entry.Request.Method, tview.AlignLeft, true)
 	t.setTableCell(rowIndex, 2, fmt.Sprintf("%d", entry.Response.Status), tview.AlignCenter, true)
@@ -221,7 +197,7 @@ func (t *Terminal) setTableCell(row, col int, text string, align int, selectable
 		SetSelectable(selectable))
 }
 
-func (t *Terminal) CreateDropDown(har *harlyzer.HAR) {
+func (t *Terminal) CreateDropDown(har *HAR) {
 	if har == nil || har.Log.Entries == nil {
 		fmt.Println("Invalid HAR data")
 		return
@@ -263,7 +239,7 @@ func (t *Terminal) CreateDropDown(har *harlyzer.HAR) {
 		SetCurrentOption(0)
 }
 
-func (t *Terminal) CreateInputField(har *harlyzer.HAR) {
+func (t *Terminal) CreateInputField(har *HAR) {
 	if t.input == nil {
 		t.input = tview.NewInputField()
 	}
@@ -316,7 +292,7 @@ func (t *Terminal) Layout() {
 	t.app.SetRoot(t.main, true).EnableMouse(true)
 }
 
-func (t *Terminal) Run(har *harlyzer.HAR) error {
+func (t *Terminal) Run(har *HAR) error {
 	// Ensure the terminal is initialized
 	if t.app == nil || t.table == nil {
 		return fmt.Errorf("terminal not initialized")
