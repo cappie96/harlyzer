@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func formatUrl(url string) string {
+func formatDomain(url string) string {
 	return strings.Split(url, "/")[2]
 }
 

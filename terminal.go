@@ -188,7 +188,7 @@ func (t *Terminal) populateRow(rowIndex int, entry Entry) {
 	t.setTableCell(rowIndex, 0, fmt.Sprintf("%d", rowIndex), tview.AlignCenter, true)
 	t.setTableCell(rowIndex, 1, entry.Request.Method, tview.AlignLeft, true)
 	t.setTableCell(rowIndex, 2, fmt.Sprintf("%d", entry.Response.Status), tview.AlignCenter, true)
-	t.setTableCell(rowIndex, 3, formatUrl(entry.Request.URL), tview.AlignLeft, true)
+	t.setTableCell(rowIndex, 3, formatDomain(entry.Request.URL), tview.AlignLeft, true)
 	t.setTableCell(rowIndex, 4, entry.ServerIP, tview.AlignCenter, true)
 	t.setTableCell(rowIndex, 5, entry.Connection, tview.AlignCenter, true)
 	t.setTableCell(rowIndex, 6, fmt.Sprintf("%.2f", entry.Time), tview.AlignRight, true)
