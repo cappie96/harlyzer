@@ -10,6 +10,11 @@ func formatDomain(url string) string {
 	return strings.Split(url, "/")[2]
 }
 
+func formatURL(url string) string {
+	splitURL := strings.Split(url, "/")
+	return strings.Join(splitURL[3:], "/")
+}
+
 func formatTimings(s interface{}) string {
 	v := reflect.ValueOf(s)
 	t := reflect.TypeOf(s)
