@@ -3,6 +3,7 @@ package harlyzer
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
@@ -10,12 +11,13 @@ import (
 )
 
 type Terminal struct {
-	app      *tview.Application
-	table    *tview.Table
-	dropdown *tview.DropDown
-	input    *tview.InputField
-	main     *tview.Flex
-	modal    *tview.Modal
+	app         *tview.Application
+	table       *tview.Table
+	dropdown    *tview.DropDown
+	urlInput    *tview.InputField
+	statusInput *tview.InputField
+	main        *tview.Flex
+	modal       *tview.Modal
 }
 
 func NewTerminal() *Terminal {
@@ -26,7 +28,8 @@ func (t *Terminal) Init() {
 	t.app = tview.NewApplication()
 	t.table = tview.NewTable()
 	t.dropdown = tview.NewDropDown()
-	t.input = tview.NewInputField()
+	t.urlInput = tview.NewInputField()
+	t.statusInput = tview.NewInputField()
 }
 
 func (t *Terminal) CreateTable(har *HAR, code string, url string) {
@@ -58,7 +61,8 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 		t.table.Clear()
 		t.SetTableHeader(headers)
 		for _, entry := range har.Log.Entries {
-			if strings.Contains(entry.Request.URL, url) && entry.Response.Status >= minCode && entry.Response.Status <= maxCode {
+			if strings.Contains(entry.Request.URL, url) && entry.Response.Status >= minCode &&
+				entry.Response.Status <= maxCode && strconv.Itoa(entry.Response.Status) == code {
 				t.populateRow(rowIndex, entry)
 				rowIndex++
 			}
@@ -245,16 +249,16 @@ func (t *Terminal) CreateDropDown(har *HAR) {
 		SetCurrentOption(0)
 }
 
-func (t *Terminal) CreateInputField(har *HAR) {
-	if t.input == nil {
-		t.input = tview.NewInputField()
+func (t *Terminal) CreateUrlInputField(har *HAR) {
+	if t.urlInput == nil {
+		t.urlInput = tview.NewInputField()
 	}
-	t.input.SetLabel("Filter: ")
-	t.input.SetFieldWidth(30)
-	t.input.SetFieldTextColor(tview.Styles.PrimaryTextColor)
+	t.urlInput.SetLabel("Url Filter: ")
+	t.urlInput.SetFieldWidth(30)
+	t.urlInput.SetFieldTextColor(tview.Styles.PrimaryTextColor)
 
-	t.input.SetChangedFunc(func(text string) {
-		url := t.input.GetText()
+	t.urlInput.SetChangedFunc(func(text string) {
+		url := t.urlInput.GetText()
 		if url != "" {
 			for _, entry := range har.Log.Entries {
 				if strings.Contains(entry.Request.URL, url) {
@@ -268,9 +272,32 @@ func (t *Terminal) CreateInputField(har *HAR) {
 	})
 }
 
+func (t *Terminal) CreateStatusCodeInputField(har *HAR) {
+	if t.statusInput == nil {
+		t.statusInput = tview.NewInputField()
+	}
+	t.statusInput.SetLabel("Status Code Filter: ")
+	t.statusInput.SetFieldWidth(15)
+	t.statusInput.SetFieldTextColor(tview.Styles.PrimaryTextColor)
+
+	t.statusInput.SetChangedFunc(func(text string) {
+		statusCode := t.statusInput.GetText()
+		if statusCode != "" {
+			for _, entry := range har.Log.Entries {
+				if strings.Contains(strconv.Itoa(entry.Response.Status), statusCode) {
+					t.CreateTable(har, statusCode, entry.Request.URL)
+					return
+				}
+			}
+		} else {
+			t.CreateTable(har, "", "")
+		}
+	})
+}
+
 func (t *Terminal) Layout() {
-	primitives := []tview.Primitive{t.table, t.dropdown, t.input}
-	form := tview.NewForm().AddFormItem(t.dropdown).AddFormItem(t.input)
+	primitives := []tview.Primitive{t.table, t.dropdown, t.urlInput, t.statusInput}
+	form := tview.NewForm().AddFormItem(t.dropdown).AddFormItem(t.urlInput).AddFormItem(t.statusInput)
 	form.AddButton("Quit", func() {
 		t.app.Stop()
 	})
@@ -306,8 +333,9 @@ func (t *Terminal) Run(har *HAR) error {
 
 	// Configure UI layout
 	t.Layout()
-	t.CreateInputField(har)
-	t.CreateDropDown(har) // Configure the dropdown and link it to the table
+	t.CreateUrlInputField(har)
+	t.CreateStatusCodeInputField(har)
+	t.CreateDropDown(har)
 
 	// Start the tview application loop
 	if err := t.app.Run(); err != nil {
