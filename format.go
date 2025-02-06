@@ -24,7 +24,7 @@ func formatTimings(s interface{}) string {
 	for i := 0; i < v.NumField(); i++ {
 		fieldName := t.Field(i).Name
 		fieldValue := v.Field(i).Float()
-		formattedTimings += fmt.Sprintf("%-10s | %.3f"+
+		formattedTimings += fmt.Sprintf("[yellow]%-10s [white]| %.3f"+
 			"ms\n", fieldName, fieldValue)
 	}
 	return formattedTimings
@@ -33,7 +33,7 @@ func formatTimings(s interface{}) string {
 func formatHeaders(headers []Header) string {
 	var formattedHeaders string
 	for _, header := range headers {
-		formattedHeaders += fmt.Sprintf("%s: %s\n", header.Name, header.Value)
+		formattedHeaders += fmt.Sprintf("[yellow]%s: [white]%s\n", header.Name, header.Value)
 	}
 	return formattedHeaders
 }
