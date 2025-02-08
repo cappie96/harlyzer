@@ -49,6 +49,7 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 	if url == "" {
 		t.table.Clear()
 		t.SetTableHeader(headers)
+		t.table.ScrollToBeginning()
 		for _, entry := range har.Log.Entries {
 			if entry.Request.URL != url && entry.Response.Status >= minCode && entry.Response.Status <= maxCode {
 				t.populateRow(rowIndex, entry)
@@ -58,6 +59,7 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 	} else {
 		t.table.Clear()
 		t.SetTableHeader(headers)
+		t.table.ScrollToBeginning()
 		for _, entry := range har.Log.Entries {
 			if strings.Contains(entry.Request.URL, url) && entry.Response.Status >= minCode &&
 				entry.Response.Status <= maxCode {
