@@ -120,7 +120,11 @@ func parseCodeFilter(code string) (int, int) {
 	case "ALL":
 		return 0, 999
 	default:
-		return 0, 999
+		code, err := strconv.Atoi(code)
+		if err != nil {
+			return 0, 999
+		}
+		return code, code
 	}
 }
 
@@ -280,7 +284,7 @@ func (t *Terminal) CreateStatusCodeInputField(har *HAR) {
 		if statusCode != "" {
 			for _, entry := range har.Log.Entries {
 				if strings.Contains(strconv.Itoa(entry.Response.Status), statusCode) {
-					t.CreateTable(har, statusCode, entry.Request.URL)
+					t.CreateTable(har, statusCode, "")
 					return
 				}
 			}
