@@ -78,6 +78,52 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 		})
 }
 
+func (t *Terminal) SetTableHeader(headers []string) {
+	for col, header := range headers {
+		t.table.SetCell(0, col, tview.NewTableCell(header).
+			SetTextColor(tview.Styles.PrimaryTextColor).
+			SetAlign(tview.AlignCenter).
+			SetSelectable(false))
+	}
+}
+
+func (t *Terminal) populateRow(rowIndex int, entry Entry) {
+	t.setTableCell(rowIndex, 0, fmt.Sprintf("%d", rowIndex), tview.AlignCenter, true)
+	t.setTableCell(rowIndex, 1, entry.Request.Method, tview.AlignLeft, true)
+	t.setTableCell(rowIndex, 2, fmt.Sprintf("%d", entry.Response.Status), tview.AlignCenter, true)
+	t.setTableCell(rowIndex, 3, formatDomain(entry.Request.URL), tview.AlignLeft, true)
+	t.setTableCell(rowIndex, 4, formatURL(entry.Request.URL), tview.AlignLeft, true)
+	t.setTableCell(rowIndex, 5, entry.ServerIP, tview.AlignLeft, true)
+	t.setTableCell(rowIndex, 6, entry.Connection, tview.AlignCenter, true)
+	t.setTableCell(rowIndex, 7, fmt.Sprintf("%.2f", entry.Time), tview.AlignCenter, true)
+}
+
+func (t *Terminal) setTableCell(row, col int, text string, align int, selectable bool) {
+	t.table.SetCell(row, col, tview.NewTableCell(text).
+		SetTextColor(tview.Styles.PrimaryTextColor).
+		SetAlign(align).
+		SetSelectable(selectable))
+}
+
+func parseCodeFilter(code string) (int, int) {
+	switch code {
+	case "1XX":
+		return 100, 199
+	case "2XX":
+		return 200, 299
+	case "3XX":
+		return 300, 399
+	case "4XX":
+		return 400, 499
+	case "5XX":
+		return 500, 599
+	case "ALL":
+		return 0, 999
+	default:
+		return 0, 999
+	}
+}
+
 func (t *Terminal) showURLOptions(entry Entry) {
 	t.modal = tview.NewModal().SetText("Select an option").
 		AddButtons([]string{"Request Headers", "Response Headers", "Content", "Timings", "Cancel"}).
@@ -160,62 +206,14 @@ func (t *Terminal) showContentDetails(entry Entry) {
 	t.app.SetRoot(contentView, true).EnableMouse(true)
 }
 
-func (t *Terminal) SetTableHeader(headers []string) {
-	for col, header := range headers {
-		t.table.SetCell(0, col, tview.NewTableCell(header).
-			SetTextColor(tview.Styles.PrimaryTextColor).
-			SetAlign(tview.AlignCenter).
-			SetSelectable(false))
-	}
-}
-
-func parseCodeFilter(code string) (int, int) {
-	switch code {
-	case "1XX":
-		return 100, 199
-	case "2XX":
-		return 200, 299
-	case "3XX":
-		return 300, 399
-	case "4XX":
-		return 400, 499
-	case "5XX":
-		return 500, 599
-	case "ALL":
-		return 0, 999
-	default:
-		return 0, 999
-	}
-}
-
-func (t *Terminal) populateRow(rowIndex int, entry Entry) {
-	t.setTableCell(rowIndex, 0, fmt.Sprintf("%d", rowIndex), tview.AlignCenter, true)
-	t.setTableCell(rowIndex, 1, entry.Request.Method, tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 2, fmt.Sprintf("%d", entry.Response.Status), tview.AlignCenter, true)
-	t.setTableCell(rowIndex, 3, formatDomain(entry.Request.URL), tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 4, formatURL(entry.Request.URL), tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 5, entry.ServerIP, tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 6, entry.Connection, tview.AlignCenter, true)
-	t.setTableCell(rowIndex, 7, fmt.Sprintf("%.2f", entry.Time), tview.AlignCenter, true)
-}
-
-// Helper function to set table cells
-func (t *Terminal) setTableCell(row, col int, text string, align int, selectable bool) {
-	t.table.SetCell(row, col, tview.NewTableCell(text).
-		SetTextColor(tview.Styles.PrimaryTextColor).
-		SetAlign(align).
-		SetSelectable(selectable))
-}
-
 func (t *Terminal) CreateDropDown(har *HAR) {
 	if har == nil || har.Log.Entries == nil {
 		fmt.Println("Invalid HAR data")
 		return
 	}
 
-	// Generate options based on unique response codes
 	codeSet := map[string]struct{}{
-		"ALL": {}, // Always include "ALL"
+		"ALL": {},
 	}
 	for _, entry := range har.Log.Entries {
 		status := entry.Response.Status
@@ -233,7 +231,6 @@ func (t *Terminal) CreateDropDown(har *HAR) {
 		}
 	}
 
-	// Convert map keys to a sorted list
 	var options []string
 	for opt := range codeSet {
 		options = append(options, opt)
