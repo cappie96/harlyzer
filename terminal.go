@@ -60,7 +60,7 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 		t.SetTableHeader(headers)
 		for _, entry := range har.Log.Entries {
 			if strings.Contains(entry.Request.URL, url) && entry.Response.Status >= minCode &&
-				entry.Response.Status <= maxCode && strconv.Itoa(entry.Response.Status) == code {
+				entry.Response.Status <= maxCode {
 				t.populateRow(rowIndex, entry)
 				rowIndex++
 			}
@@ -239,7 +239,7 @@ func (t *Terminal) CreateDropDown(har *HAR) {
 		SetOptions(options, func(option string, index int) {
 			t.CreateTable(har, option, "")
 		}).
-		SetCurrentOption(0)
+		SetCurrentOption(len(options) - 1)
 }
 
 func (t *Terminal) CreateUrlInputField(har *HAR) {
