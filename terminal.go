@@ -40,14 +40,12 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 	t.table.SetFixed(1, 1).SetBorderPadding(1, 1, 1, 1)
 	t.table.SetBorder(true).SetTitle("HAR Log")
 
-	// Headers
 	headers := []string{"#", "Method", "Status", "Domain", "Url", "Server IP", "Connection", "Time (ms)"}
 	t.SetTableHeader(headers)
-	// Parse code filter
+
 	minCode, maxCode := parseCodeFilter(code)
 
-	// Populate table rows
-	rowIndex := 1 // Start populating from the second row
+	rowIndex := 1
 	if url == "" {
 		t.table.Clear()
 		t.SetTableHeader(headers)
@@ -237,10 +235,8 @@ func (t *Terminal) CreateDropDown(har *HAR) {
 	}
 	sort.Strings(options)
 
-	// Configure dropdown
 	t.dropdown.SetLabel("Select an error code: ").
 		SetOptions(options, func(option string, index int) {
-			// When the user selects an option, update the table
 			t.CreateTable(har, option, "")
 		}).
 		SetCurrentOption(0)
@@ -323,18 +319,15 @@ func (t *Terminal) Layout() {
 }
 
 func (t *Terminal) Run(har *HAR) error {
-	// Ensure the terminal is initialized
 	if t.app == nil || t.table == nil {
 		return fmt.Errorf("terminal not initialized")
 	}
 
-	// Configure UI layout
 	t.Layout()
 	t.CreateUrlInputField(har)
 	t.CreateStatusCodeInputField(har)
 	t.CreateDropDown(har)
 
-	// Start the tview application loop
 	if err := t.app.Run(); err != nil {
 		return fmt.Errorf("application run failed: %w", err)
 	}
