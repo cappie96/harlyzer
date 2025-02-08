@@ -237,7 +237,7 @@ func (t *Terminal) CreateDropDown(har *HAR) {
 	}
 	sort.Strings(options)
 
-	t.dropdown.SetLabel("Select a status code range: ").
+	t.dropdown.SetLabel("Status Code Range: ").
 		SetOptions(options, func(option string, index int) {
 			t.CreateTable(har, option, "")
 		}).
