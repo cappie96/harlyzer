@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cappstr/harlyzer"
+	"github.com/cappie96/harlyzer"
 )
 
 func main() {
