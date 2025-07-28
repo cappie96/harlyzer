@@ -32,6 +32,12 @@ func (t *Terminal) Init() {
 	t.statusInput = tview.NewInputField()
 }
 
+func (t *Terminal) InitTable(headers []string) {
+	t.table.Clear()
+	t.SetTableHeader(headers)
+	t.table.ScrollToBeginning()
+}
+
 func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 	if har == nil || har.Log.Entries == nil {
 		fmt.Println("Invalid HAR data")
@@ -47,9 +53,7 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 
 	rowIndex := 1
 	if url == "" {
-		t.table.Clear()
-		t.SetTableHeader(headers)
-		t.table.ScrollToBeginning()
+		t.InitTable(headers)
 		for _, entry := range har.Log.Entries {
 			if entry.Request.URL != url && entry.Response.Status >= minCode && entry.Response.Status <= maxCode {
 				t.populateRow(rowIndex, entry)
@@ -57,9 +61,7 @@ func (t *Terminal) CreateTable(har *HAR, code string, url string) {
 			}
 		}
 	} else {
-		t.table.Clear()
-		t.SetTableHeader(headers)
-		t.table.ScrollToBeginning()
+		t.InitTable(headers)
 		for _, entry := range har.Log.Entries {
 			if strings.Contains(entry.Request.URL, url) && entry.Response.Status >= minCode &&
 				entry.Response.Status <= maxCode {
