@@ -88,21 +88,21 @@ func (t *Terminal) SetTableHeader(headers []string) {
 }
 
 func (t *Terminal) populateRow(rowIndex int, entry Entry) {
-	t.setTableCell(rowIndex, 0, fmt.Sprintf("%d", rowIndex), tview.AlignCenter, true)
-	t.setTableCell(rowIndex, 1, entry.Request.Method, tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 2, fmt.Sprintf("%d", entry.Response.Status), tview.AlignCenter, true)
-	t.setTableCell(rowIndex, 3, formatDomain(entry.Request.URL), tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 4, formatURL(entry.Request.URL), tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 5, entry.ServerIP, tview.AlignLeft, true)
-	t.setTableCell(rowIndex, 6, entry.Connection, tview.AlignCenter, true)
-	t.setTableCell(rowIndex, 7, fmt.Sprintf("%.2f", entry.Time), tview.AlignCenter, true)
+	t.setTableCell(rowIndex, 0, fmt.Sprintf("%d", rowIndex), tview.AlignCenter, true, 10)
+	t.setTableCell(rowIndex, 1, entry.Request.Method, tview.AlignLeft, true, 15)
+	t.setTableCell(rowIndex, 2, fmt.Sprintf("%d", entry.Response.Status), tview.AlignCenter, true, 10)
+	t.setTableCell(rowIndex, 3, formatDomain(entry.Request.URL), tview.AlignLeft, true, 50)
+	t.setTableCell(rowIndex, 4, formatURL(entry.Request.URL), tview.AlignLeft, true, 80)
+	t.setTableCell(rowIndex, 5, entry.ServerIP, tview.AlignLeft, true, 20)
+	t.setTableCell(rowIndex, 6, entry.Connection, tview.AlignCenter, true, 20)
+	t.setTableCell(rowIndex, 7, fmt.Sprintf("%.2f", entry.Time), tview.AlignCenter, true, 20)
 }
 
-func (t *Terminal) setTableCell(row, col int, text string, align int, selectable bool) {
+func (t *Terminal) setTableCell(row, col int, text string, align int, selectable bool, width int) {
 	t.table.SetCell(row, col, tview.NewTableCell(text).
 		SetTextColor(tview.Styles.PrimaryTextColor).
 		SetAlign(align).
-		SetSelectable(selectable))
+		SetSelectable(selectable).SetMaxWidth(width).SetExpansion(0))
 }
 
 func parseCodeFilter(code string) (int, int) {
@@ -296,14 +296,14 @@ func (t *Terminal) CreateStatusCodeInputField(har *HAR) {
 
 func (t *Terminal) Layout() {
 	primitives := []tview.Primitive{t.table, t.dropdown, t.urlInput, t.statusInput}
-	form := tview.NewForm().AddFormItem(t.dropdown).AddFormItem(t.urlInput).AddFormItem(t.statusInput)
+	form := tview.NewForm().AddFormItem(t.dropdown).AddFormItem(t.urlInput).AddFormItem(t.statusInput).SetHorizontal(true)
 	form.AddButton("Quit", func() {
 		t.app.Stop()
 	})
 	form.SetBorder(true).SetTitle("Menu")
-	t.main = tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(form, 60, 1, false).
-		AddItem(t.table, 0, 1, true)
+	t.main = tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(form, 0, 1, false).
+		AddItem(t.table, 0, 5, true)
 
 	t.main.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyTab {
