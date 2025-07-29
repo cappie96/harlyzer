@@ -102,7 +102,7 @@ func (t *Terminal) populateRow(rowIndex int, entry Entry) {
 
 func (t *Terminal) setTableCell(row, col int, text string, align int, selectable bool, width int) {
 	t.table.SetCell(row, col, tview.NewTableCell(text).
-		SetTextColor(tview.Styles.PrimaryTextColor).
+		SetTextColor(tcell.ColorKhaki).
 		SetAlign(align).
 		SetSelectable(selectable).SetMaxWidth(width).SetExpansion(0))
 }
@@ -256,7 +256,6 @@ func (t *Terminal) CreateUrlInputField(har *HAR) {
 	}
 	t.urlInput.SetLabel("Url Filter: ")
 	t.urlInput.SetFieldWidth(30)
-	t.urlInput.SetFieldTextColor(tview.Styles.PrimaryTextColor)
 
 	t.urlInput.SetChangedFunc(func(text string) {
 		url := t.urlInput.GetText()
@@ -279,7 +278,6 @@ func (t *Terminal) CreateStatusCodeInputField(har *HAR) {
 	}
 	t.statusInput.SetLabel("Status Code Filter: ")
 	t.statusInput.SetFieldWidth(15)
-	t.statusInput.SetFieldTextColor(tview.Styles.PrimaryTextColor)
 
 	t.statusInput.SetChangedFunc(func(text string) {
 		statusCode := t.statusInput.GetText()
@@ -302,7 +300,7 @@ func (t *Terminal) Layout() {
 	form.AddButton("Quit", func() {
 		t.app.Stop()
 	})
-	form.SetBorder(true).SetTitle("Menu")
+	form.SetBorder(true).SetTitle("Filters")
 	t.main = tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(form, 0, 1, false).
 		AddItem(t.table, 0, 5, true)
